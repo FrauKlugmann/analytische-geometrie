@@ -305,7 +305,7 @@ Aktuell ist der zweidimensionale Raum aktiv.
 <div class="buttons"><button class="check" onclick="checkM6()">Lösung prüfen</button><button class="hint" onclick="hintM6()">Hinweis</button><button class="new" onclick="newM6()">Neue Aufgabe</button></div><div id="fb6" class="feedback"></div></div>
 </div></section>
 <section id="moduleFinal" class="module"><div class="progress"><span id="finalProgress"></span><span id="finalScore"></span></div><div class="card"><div class="task"><strong>Abschlussübungen</strong></div><p>Bearbeite die Aufgabe auf Papier und trage hier nur dein Endergebnis ein.</p><div id="finalTask"></div><div class="final-answer" id="finalAnswer"></div><div class="buttons"><button class="check" onclick="checkFinal()">Ergebnis prüfen</button><button class="new" onclick="nextFinal()">Nächste Aufgabe</button></div><div id="finalFeedback" class="feedback"></div></div></section>
-<div class="card" style="text-align:center"><strong>Adaptiver Lernstand</strong><p class="small" id="learningStatus"></p><button class="new" onclick="resetLearning()">Lernstand zurücksetzen</button></div>
+<div class="card" style="text-align:center"><strong>Adaptiver Lernstand</strong><p class="small" id="learningStatus"></p><button id="resetBtn" class="new" onclick="resetLearning()">Lernstand zurücksetzen</button></div>
 </main>
 <footer class="trainer-footer">Erstellt von Marion Klugmann (Oktober 2026) mit freundlicher Unterstützung von ChatGPT und Claude.</footer>
 
@@ -796,8 +796,11 @@ function markMastered(module){masteredTasks[module].add(taskKeys[module]);update
 function updateLearningStatus(){
  document.getElementById('learningStatus').textContent='In dieser Sitzung richtig gelöst (wird nicht erneut gestellt): '+[1,2,3,4,5,6].map(n=>'Modul '+n+': '+masteredTasks[n].size).join(' · ');
 }
+let resetArmed=false;
 function resetLearning(){
- if(!confirm('Den gesamten Lernstand zurücksetzen und alle Aufgaben wieder freigeben?'))return;
+ const btn=document.getElementById('resetBtn');
+ if(!resetArmed){resetArmed=true;btn.textContent='Wirklich zurücksetzen? Zum Bestätigen nochmal tippen';setTimeout(()=>{resetArmed=false;btn.textContent='Lernstand zurücksetzen'},5000);return;}
+ resetArmed=false;btn.textContent='Lernstand zurücksetzen';
  for(let n=1;n<=6;n++)masteredTasks[n].clear();
  updateLearningStatus();finalIndex=0;finalCorrect=0;finalData=null;newM1();newM2();newM3();newM4();newM5();newM6();
 }
