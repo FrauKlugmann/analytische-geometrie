@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Trainer Analytische Geometrie</title>
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="apple-touch-icon.png">
+<style>
+*{box-sizing:border-box} body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f3f6fa;color:#1f2937}
+header{background:#12365b;color:white;padding:25px max(20px,calc(50vw - 480px));display:flex;align-items:center;gap:18px} header h1{margin:0 0 5px;font-size:29px} header p{margin:0}
+.logo{width:64px;height:64px;border-radius:15px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+@media(max-width:560px){.logo{width:48px;height:48px;border-radius:11px} header h1{font-size:24px}}
+.container{max-width:900px;margin:28px auto;padding:0 18px}
+.tabs{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.tab{background:#dfe7f0;color:#17365d;font-weight:bold}.tab.active{background:#17365d;color:white}
+.card{background:white;border-radius:12px;padding:26px;box-shadow:0 3px 12px rgba(0,0,0,.08);margin-bottom:18px}
+.module{display:none}.module.active{display:block}.progress{display:flex;justify-content:space-between;color:#555;font-size:14px;margin-bottom:12px}
+.task{font-size:19px;line-height:1.6}.points{text-align:center;font-size:23px;font-weight:bold;margin:18px 0}
+.equation{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin:26px 0;font-size:21px;line-height:1}
+.equation>span{display:inline-flex;align-items:center;align-self:center}
+.equation .display-vector{align-self:center;vertical-align:middle}
+.vector{display:inline-grid;grid-template-columns:55px;gap:5px;padding:8px 12px;border-left:2px solid #333;border-right:2px solid #333;border-radius:8px}
+.vector input{width:50px;height:38px;text-align:center;font-size:18px;border:1px solid #aaa;border-radius:5px}
+button{border:0;border-radius:7px;padding:11px 18px;font-size:15px;cursor:pointer;margin:5px}
+.check{background:#2463a5;color:white}.hint{background:#f3b33d}.new{background:#e5e7eb}.choice{background:#e5e7eb;min-width:100px}
+.choice.selected{background:#2463a5;color:white}.buttons{text-align:center}
+.feedback{margin-top:18px;padding:15px;border-radius:8px;display:none;line-height:1.55}
+.correct{display:block!important;background:#e5f5e9;border-left:5px solid #2e8b57}
+.wrong{display:block!important;background:#fdeaea;border-left:5px solid #c0392b}
+.info{display:block!important;background:#fff4d6;border-left:5px solid #e0a020}
+.formula{text-align:center;font-size:20px;margin:15px 0}.explanation{line-height:1.7}
+.vec{position:relative;display:inline-block;font-style:italic;line-height:1;padding-top:.22em}
+.vec::before,.overvec::before{content:"";position:absolute;left:-.04em;right:-.17em;top:.06em;border-top:1.7px solid currentColor}
+.vec::after,.overvec::after{content:"";position:absolute;right:-.17em;top:.01em;width:.27em;height:.27em;border-top:1.7px solid currentColor;border-right:1.7px solid currentColor;transform:rotate(45deg)}
+.overvec{position:relative;display:inline-block;padding-top:.25em}
+.calc{max-width:620px;margin:18px auto;background:#f7f9fc;border-radius:10px;padding:16px}
+.calc input{width:75px;padding:8px;font-size:16px;text-align:center;margin:3px}
+.vinput{display:inline-grid;grid-template-columns:52px;gap:3px;padding:6px 9px;border-left:2px solid #333;border-right:2px solid #333;border-radius:7px;vertical-align:middle}
+.vinput input{width:48px!important;padding:6px!important;margin:0!important}
+.probeeq{display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap;margin:16px 0;font-size:18px}
+.mini-check{background:#607d9c;color:white;padding:9px 14px}
+#probeFeedback{margin-top:10px}
+.param-row{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin:8px 0}
+.no-solution{padding:9px 13px;min-width:auto}
+.no-solution.selected{background:#2463a5;color:#fff}
+.small{font-size:14px;color:#5b6470}
+.author-credit{position:absolute;right:18px;bottom:9px;font-size:12px;font-weight:normal;opacity:.85;white-space:nowrap}
+@media(max-width:600px){.card{padding:18px}.equation{font-size:18px}.points{font-size:20px}.author-credit{position:static;text-align:right;margin-top:12px;font-size:11px}}
+
+.minus-key{background:#17365d;color:#fff;font-size:22px;font-weight:bold;min-width:44px;height:42px;padding:6px 13px;line-height:1;border-radius:7px;flex:0 0 auto}
+.minus-key:hover{background:#2463a5}
+
+.trainer-footer{max-width:900px;margin:15px auto 30px;padding:14px 18px;color:#111;text-align:right;font-size:13px}
+</style>
+<style>
+/* Pfeile/Spinner in allen Zahleneingabefeldern ausblenden */
+input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.m3-choice-grid{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:20px 0}
+.m3-choice{background:#e5e7eb;min-width:120px}
+.m3-choice.selected{background:#2463a5;color:#fff}
+.two-lines{display:grid;gap:18px;margin:22px 0}
+.line-display{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;font-size:20px}
+.line-display>span{display:inline-flex;align-items:center}
+.vec2{display:inline-block;border-left:2px solid #333;border-right:2px solid #333;border-radius:7px;padding:6px 11px;line-height:1.45;text-align:center;min-width:42px}
+.substage{font-size:14px;color:#5b6470;margin-bottom:12px}
+#tabFinal{background:#c9efcc;color:#155b2c}#tabFinal.active{background:#176c37;color:white}
+#finalChoices button.selected{background:#176c37;color:white}
+.final-input{width:64px;padding:8px;text-align:center;font-size:17px;margin:3px;border:1px solid #a8b5c4;border-radius:5px}
+.final-vector{display:inline-grid;grid-template-columns:65px;border-left:2px solid #333;border-right:2px solid #333;border-radius:8px;padding:6px;vertical-align:middle;gap:3px}
+.final-vector input{width:55px}.final-answer{margin:15px auto;text-align:center;line-height:2}
+</style>
+<style>
+/* Exakte vertikale Zentrierung an der mittleren (y-)Komponente */
+.equation {
+  display: flex !important;
+  flex-direction: row;
+  align-items: center !important;
+}
+.equation > span,
+.equation > .vector,
+.equation > .display-vector {
+  align-self: center !important;
+  vertical-align: middle !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+.equation > span {
+  display: inline-flex !important;
+  align-items: center !important;
+  height: auto;
+}
+#m5inputs{display:contents!important}
+</style>
+</head>
+<body>
+<header><img class="logo" src="apple-touch-icon.png" alt=""><div><h1>Trainer Analytische Geometrie</h1><p>Klasse 12 · Emil-Petri-Schule Arnstadt</p></div></header>
+<main class="container">
+<div class="tabs">
+<button id="tab1" class="tab active" onclick="showModule(1)">Modul 1 · Geradengleichung</button>
+<button id="tab2" class="tab" onclick="showModule(2)">Modul 2 · Punktprobe</button>
+<button id="tab3" class="tab" onclick="showModule(3)">Modul 3 · Lage von Geraden</button>
+<button id="tab4" class="tab" onclick="showModule(4)">Modul 4 · Winkel zwischen Geraden</button>
+<button id="tab5" class="tab" onclick="showModule(5)">Modul 5 · Ebenengleichung</button>
+<button id="tab6" class="tab" onclick="showModule(6)">Modul 6 · Lage Gerade–Ebene</button>
+<button id="tabFinal" class="tab" onclick="showFinal()">Abschlussübungen</button>
+</div>
+
+<section id="module1" class="module active">
+<div class="progress"><span id="m1num"></span><span id="m1score">Richtig: 0</span></div>
+<div class="card">
+<div class="task">Gegeben sind die beiden Punkte</div>
+<div class="points">A(<span id="ax"></span> | <span id="ay"></span> | <span id="az"></span>) &nbsp;und&nbsp; B(<span id="bx"></span> | <span id="by"></span> | <span id="bz"></span>)</div>
+<div class="task">Stelle eine Parametergleichung der Geraden <strong>g</strong> auf, die durch A und B verläuft.</div>
+<div class="equation"><span><strong>g:</strong> <span class="vec">x</span> =</span>
+<div class="vector"><input id="sx" type="number"><input id="sy" type="number"><input id="sz" type="number"></div>
+<span>+ t ·</span><div class="vector"><input id="rx" type="number"><input id="ry" type="number"><input id="rz" type="number"></div></div>
+<div class="buttons"><button class="check" onclick="checkM1()">Lösung prüfen</button><button class="hint" onclick="hintM1()">Hinweis</button><button class="new" onclick="newM1()">Neue Aufgabe</button></div>
+<div id="fb1" class="feedback"></div>
+</div>
+<div class="card explanation"><strong>Merke:</strong>
+<div class="formula"><span class="vec">x</span> = <span class="overvec">OA</span> + t · <span class="vec">u</span></div>
+<p>Ein möglicher Richtungsvektor ist</p>
+<div class="formula"><span class="overvec">AB</span> = <span class="overvec">OB</span> − <span class="overvec">OA</span></div>
+</div>
+</section>
+
+<section id="module2" class="module">
+<div class="progress"><span id="m2num"></span><span id="m2score">Richtig: 0</span></div>
+<div class="card">
+<div class="task"><strong>Punktprobe</strong> · <span id="typeLabel"></span></div>
+<div id="m2task"></div>
+
+<div class="calc" id="calcBox">
+<div class="task" style="font-size:16px"><strong>Deine Rechnung:</strong></div>
+<div id="calcPrompt" class="small"></div>
+<div id="classicProbe"></div>
+<div class="param-row" id="paramRow">
+<span id="paramLabel">Parameter:</span>
+<input id="paramInput" type="text" inputmode="text" placeholder="z. B. -1/3" oninput="clearNoSolution()">
+<button id="noSolutionBtn" type="button" class="choice no-solution" onclick="toggleNoSolution()">Keine Lösung</button>
+</div>
+</div>
+
+<div class="task" style="text-align:center;margin-top:18px">Wie lautet dein Ergebnis?</div>
+<div class="buttons">
+<button id="yesBtn" class="choice" onclick="selectM2(true)">Ja</button>
+<button id="noBtn" class="choice" onclick="selectM2(false)">Nein</button>
+</div>
+<div class="buttons"><button class="check" onclick="checkM2()">Lösung prüfen</button><button class="hint" onclick="hintM2()">Hinweis</button><button class="new" onclick="newM2()">Neue Aufgabe</button></div>
+<div id="fb2" class="feedback"></div>
+</div>
+
+<div class="card explanation">
+<strong>Strategie zur Punktprüfung:</strong>
+<p><strong>Typ 1:</strong> Stelle zunächst die klassische Punktprobe auf: Die rechte Seite der Geradengleichung wird mit dem Ortsvektor <span class="overvec">OP</span> gleichgesetzt. Danach entstehen drei Koordinatengleichungen. Für alle drei muss <em>derselbe</em> Parameterwert gelten.</p>
+<p><strong>Typ 2:</strong> Stelle aus A und B zunächst eine Geradengleichung auf. Führe dann für C dieselbe klassische Punktprobe durch: Setze die rechte Seite der Geradengleichung gleich dem Ortsvektor <span class="overvec">OC</span>. Die drei Punkte liegen genau dann auf einer Geraden, wenn alle drei Koordinatengleichungen denselben Parameterwert liefern.</p>
+</div>
+</section>
+
+<section id="module3" class="module">
+<div class="progress"><span id="m3num"></span><span id="m3score">Richtig: 0</span></div>
+<div class="card">
+<div class="task"><strong>Lage von Geraden zueinander</strong></div>
+<div class="substage"><strong>Raum auswählen:</strong></div>
+<div class="m3-choice-grid" style="margin-top:8px">
+<button id="m3dim2" class="m3-choice selected" onclick="setM3Dimension(2)">Zweidimensionaler Raum</button>
+<button id="m3dim3" class="m3-choice" onclick="setM3Dimension(3)">Dreidimensionaler Raum</button>
+</div>
+<div id="m3dimNotice" class="small" style="text-align:center;margin-bottom:14px">
+Aktuell ist der zweidimensionale Raum aktiv.
+</div>
+<div class="task">Gegeben sind die beiden Geraden <strong>g</strong> und <strong>h</strong>. Bestimme ihre Lage zueinander.</div>
+
+<div class="two-lines">
+<div id="m3g" class="line-display"></div>
+<div id="m3h" class="line-display"></div>
+</div>
+
+<div id="m3precheck" class="calc m3z" style="display:none">
+<div class="task" style="font-size:16px"><strong>Vorprüfung der Richtungsvektoren</strong></div>
+<div class="small" style="text-align:center;margin-bottom:8px">Sind die Richtungsvektoren Vielfache voneinander?</div>
+<div class="m3-choice-grid" style="margin:10px 0 18px">
+<button id="m3dirMultiple" class="m3-choice" type="button" onclick="selectM3DirRelation('multiple')">sind Vielfache voneinander</button>
+<button id="m3dirNotMultiple" class="m3-choice" type="button" onclick="selectM3DirRelation('notmultiple')">sind nicht Vielfache voneinander</button>
+</div>
+<div class="small" style="text-align:center;margin-bottom:8px">Welche Lagebeziehungen kommen damit noch in Frage?</div>
+<div class="m3-choice-grid" style="margin:10px 0">
+<button id="m3preCut" class="m3-choice" type="button" onclick="toggleM3Possible('schneidend')">schneidend</button>
+<button id="m3preSkew" class="m3-choice" type="button" onclick="toggleM3Possible('windschief')">windschief</button>
+<button id="m3preParallel" class="m3-choice" type="button" onclick="toggleM3Possible('parallel')">parallel</button>
+<button id="m3preIdentical" class="m3-choice" type="button" onclick="toggleM3Possible('identisch')">identisch</button>
+</div>
+<div class="buttons"><button class="mini-check" type="button" onclick="checkM3Precheck()">Vorprüfung prüfen</button></div>
+<div id="m3prefb" class="feedback"></div>
+</div>
+
+<div class="calc">
+<div class="task" style="font-size:16px"><strong>Deine Rechnung:</strong></div>
+<div class="small">1. Setze die rechten Seiten der beiden Geradengleichungen gleich. Trage beide Stütz- und Richtungsvektoren selbst ein.</div>
+<div class="probeeq">
+<span class="vinput"><input id="m3gsx" type="number"><input id="m3gsy" type="number"><input id="m3gsz" class="m3z" type="number"></span>
+<span>+ t ·</span>
+<span class="vinput"><input id="m3grx" type="number"><input id="m3gry" type="number"><input id="m3grz" class="m3z" type="number"></span>
+<span>=</span>
+<span class="vinput"><input id="m3hsx" type="number"><input id="m3hsy" type="number"><input id="m3hsz" class="m3z" type="number"></span>
+<span>+ s ·</span>
+<span class="vinput"><input id="m3hrx" type="number"><input id="m3hry" type="number"><input id="m3hrz" class="m3z" type="number"></span>
+</div>
+<div class="buttons"><button class="mini-check" onclick="checkM3Equation()">Gleichung prüfen</button></div>
+<div id="m3eqfb" class="feedback"></div>
+
+<div class="small" style="margin-top:18px">2. Löse das entstehende Gleichungssystem nach <strong>t</strong> und <strong>s</strong>. Brüche sind erlaubt.</div>
+<div class="param-row">
+<span>t =</span><input id="m3t" type="text" inputmode="text" placeholder="z. B. 1/2" oninput="clearM3Special()">
+<span>s =</span><input id="m3s" type="text" inputmode="text" placeholder="z. B. -2" oninput="clearM3Special()">
+</div>
+<div class="buttons">
+<button id="m3none" class="choice no-solution" type="button" onclick="selectM3Special('none')">Keine Lösung</button>
+<button id="m3infinite" class="choice no-solution" type="button" onclick="selectM3Special('infinite')">Unendlich viele Lösungen</button>
+</div>
+
+</div>
+<div class="task" style="text-align:center">3. Wie liegen die beiden Geraden zueinander?</div>
+<div class="m3-choice-grid">
+<button id="m3cut" class="m3-choice" onclick="selectM3('schneidend')">schneidend</button>
+<button id="m3parallel" class="m3-choice" onclick="selectM3('parallel')">parallel</button>
+<button id="m3identical" class="m3-choice" onclick="selectM3('identisch')">identisch</button>
+<button id="m3skew" class="m3-choice m3z" onclick="selectM3('windschief')">windschief</button>
+</div>
+
+<div id="m3intersectionBlock" style="margin-top:18px;display:none">
+<div class="small" style="text-align:center">4. Falls sich die Geraden schneiden: Gib den <strong>Schnittpunkt S</strong> an.</div>
+<div class="param-row">
+<span>S (</span>
+<input id="m3ix" type="text" inputmode="text" placeholder="x">
+<span>|</span>
+<input id="m3iy" type="text" inputmode="text" placeholder="y">
+<span id="m3izSep" class="m3z">|</span><input id="m3iz" class="m3z" type="text" inputmode="text" placeholder="z">
+<span>)</span>
+</div>
+</div>
+
+<div class="buttons">
+<button class="check" onclick="checkM3()">Lösung prüfen</button>
+<button class="hint" onclick="hintM3()">Hinweis</button>
+<button class="new" onclick="newM3()">Neue Aufgabe</button>
+</div>
+<div id="fb3" class="feedback"></div>
+</div>
+
+</section>
+
+
+<section id="module4" class="module">
+<div class="progress"><span id="m4num"></span><span id="m4score">Richtig: 0</span></div>
+<div class="card">
+<div class="task"><strong>Schnittwinkel zwischen zwei Geraden</strong></div>
+<div class="substage" style="margin-top:15px"><strong>Raum auswählen:</strong></div>
+<div class="m3-choice-grid" style="margin-top:8px">
+<button id="m4dim2" class="m3-choice selected" onclick="setM4Dimension(2)">Zweidimensionaler Raum</button>
+<button id="m4dim3" class="m3-choice" onclick="setM4Dimension(3)">Dreidimensionaler Raum</button>
+</div>
+<p class="small" style="text-align:center">Die beiden Geraden schneiden sich. <strong>Bestimme einen Schnittwinkel auf eine Stelle nach dem Komma.</strong></p>
+<div class="two-lines"><div id="m4g" class="line-display"></div><div id="m4h" class="line-display"></div></div>
+<div class="calc">
+<div class="task" style="font-size:16px"><strong>Schnittwinkel:</strong></div>
+<div class="param-row"><label for="m4angle">α =</label><input id="m4angle" type="text" inputmode="decimal" placeholder="z. B. 63,4" style="width:110px;padding:9px;text-align:center;font-size:17px"><span>°</span><button type="button" class="minus-key" id="m4comma" onclick="insertM4Comma()" title="Komma eingeben">,</button></div>
+</div>
+<div class="buttons"><button class="check" onclick="checkM4()">Lösung prüfen</button><button class="hint" onclick="hintM4()">Hinweis</button><button class="new" onclick="newM4()">Neue Aufgabe</button></div>
+<div id="fb4" class="feedback"></div>
+</div>
+</section>
+
+<section id="module5" class="module">
+<div class="progress"><span id="m5num"></span><span id="m5score">Richtig: 0</span></div>
+<div class="card"><div class="task"><strong>Ebenengleichung in Parameterform</strong></div>
+<p class="task">Gegeben sind die drei Punkte</p><div id="m5points" class="points"></div>
+<p class="task">Stelle eine Parametergleichung der Ebene E durch A, B und C auf.</p>
+<div class="equation"><span><strong>E:</strong> <span class="vec">x</span> =</span><span id="m5inputs" style="display:contents"></span><button type="button" class="minus-key" onclick="insertMinusFor('module5')">−</button></div>
+<div class="buttons"><button class="check" onclick="checkM5()">Lösung prüfen</button><button class="hint" onclick="hintM5()">Hinweis</button><button class="new" onclick="newM5()">Neue Aufgabe</button></div><div id="fb5" class="feedback"></div></div>
+</section>
+<section id="module6" class="module">
+<div class="progress"><span id="m6num"></span><span id="m6score">Richtig: 0</span></div>
+<div class="card"><div class="task"><strong>Lage einer Geraden zu einer Ebene</strong></div>
+<p class="task">Gegeben sind die Gerade g und die Ebene E. Bestimme ihre Lage zueinander.</p>
+<div class="two-lines"><div id="m6g" class="line-display"></div><div id="m6e" class="line-display"></div></div>
+<div id="m6work"><div class="calc"><div class="small"><strong>1. Gleichsetzen</strong></div>
+<div class="probeeq" id="m6eqinputs"></div><div class="buttons"><button class="mini-check" onclick="checkM6Equation()">Gleichung prüfen</button></div><div id="m6eqfb" class="feedback"></div>
+<div class="small">2. Bestimme die Parameter t, r und s oder wähle die Art der Lösungsmenge.</div>
+<div class="param-row"><span>t =</span><input id="m6t" type="text" inputmode="decimal"><span>r =</span><input id="m6r" type="text" inputmode="decimal"><span>s =</span><input id="m6s" type="text" inputmode="decimal"><button type="button" class="minus-key" onclick="insertMinusFor('module6')">−</button></div>
+<div class="m3-choice-grid"><button id="m6none" class="m3-choice" onclick="selectM6Special('none')">Keine Lösung</button><button id="m6one" class="m3-choice" onclick="selectM6Special('one')">Genau eine Lösung</button><button id="m6inf" class="m3-choice" onclick="selectM6Special('infinite')">Unendlich viele Lösungen</button></div></div>
+<div class="task" style="text-align:center">3. Wie liegt die Gerade zur Ebene?</div>
+<div class="m3-choice-grid"><button id="m6cut" class="m3-choice" onclick="selectM6('schneidend')">schneidend</button><button id="m6parallel" class="m3-choice" onclick="selectM6('parallel')">parallel</button><button id="m6contained" class="m3-choice" onclick="selectM6('enthalten')">Gerade liegt in der Ebene</button></div>
+<div id="m6intersection" style="display:none;text-align:center"><div class="small">Falls schneidend: Gib den Schnittpunkt an.</div><div class="param-row">S (<input id="m6ix" type="text" inputmode="decimal"> | <input id="m6iy" type="text" inputmode="decimal"> | <input id="m6iz" type="text" inputmode="decimal">)<button type="button" class="minus-key" onclick="insertMinusFor('module6')">−</button></div></div>
+<div class="buttons"><button class="check" onclick="checkM6()">Lösung prüfen</button><button class="hint" onclick="hintM6()">Hinweis</button><button class="new" onclick="newM6()">Neue Aufgabe</button></div><div id="fb6" class="feedback"></div></div>
+</div></section>
+<section id="moduleFinal" class="module"><div class="progress"><span id="finalProgress"></span><span id="finalScore"></span></div><div class="card"><div class="task"><strong>Abschlussübungen</strong></div><p>Bearbeite die Aufgabe auf Papier und trage hier nur dein Endergebnis ein.</p><div id="finalTask"></div><div class="final-answer" id="finalAnswer"></div><div class="buttons"><button class="check" onclick="checkFinal()">Ergebnis prüfen</button><button class="new" onclick="nextFinal()">Nächste Aufgabe</button></div><div id="finalFeedback" class="feedback"></div></div></section>
+<div class="card" style="text-align:center"><strong>Adaptiver Lernstand</strong><p class="small" id="learningStatus"></p><button class="new" onclick="resetLearning()">Lernstand zurücksetzen</button></div>
+</main>
+<footer class="trainer-footer">Erstellt von Marion Klugmann (Oktober 2026) mit freundlicher Unterstützung von ChatGPT und Claude.</footer>
+
+<script>
+const rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const sub=(a,b)=>a.map((x,i)=>x-b[i]);
+const add=(a,b)=>a.map((x,i)=>x+b[i]);
+const mul=(k,v)=>v.map(x=>k*x);
+const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+const zero=v=>v.every(x=>Math.abs(x)<1e-9);
+const parallel=(a,b)=>!zero(a)&&!zero(b)&&zero(cross(a,b));
+const fmt=P=>"("+P.join(" | ")+")";
+let A,B,m1n=0,m1score=0,m1hint=0,m1solved=false;
+let m2n=0,m2score=0,m2hint=0,m2solved=false,m2choice=null,m2type=1,m2data={},noSolutionSelected=false;
+
+function showModule(n){
+ document.querySelectorAll(".module").forEach(x=>x.classList.remove("active"));
+ document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+ document.getElementById("module"+n).classList.add("active");document.getElementById("tab"+n).classList.add("active");
+}
+function newM1(){
+ do{A=[rnd(-5,5),rnd(-5,5),rnd(-5,5)];B=[rnd(-5,5),rnd(-5,5),rnd(-5,5)]}while(A.every((x,i)=>x===B[i]));
+ m1n++;m1hint=0;m1solved=false;document.getElementById("m1num").textContent="Aufgabe "+m1n;
+ ["x","y","z"].forEach((c,i)=>{document.getElementById("a"+c).textContent=A[i];document.getElementById("b"+c).textContent=B[i]});
+ ["sx","sy","sz","rx","ry","rz"].forEach(id=>document.getElementById(id).value="");hide("fb1");
+}
+function read(p){return ["x","y","z"].map(c=>parseMathNumber(document.getElementById(p+c).value))}
+function checkM1(){
+ let f=document.getElementById("fb1"); if(["sx","sy","sz","rx","ry","rz"].some(id=>document.getElementById(id).value===""))return feedback(f,"wrong","Bitte trage alle sechs Koordinaten ein.");
+ let S=read("s"),R=read("r"),AB=sub(B,A); if([...S,...R].some(x=>!Number.isFinite(x)))return feedback(f,"wrong","Bitte nur Zahlen eingeben, z. B. -3 oder 1/2.");if(zero(R))return feedback(f,"wrong","Der Richtungsvektor darf nicht der Nullvektor sein.");
+ let support=zero(sub(S,A))||parallel(sub(S,A),AB),dir=parallel(R,AB);
+ if(support&&dir){if(!m1solved){m1score++;m1solved=true;markMastered(1);document.getElementById("m1score").textContent="Richtig: "+m1score}feedback(f,"correct","✓ Richtig! Deine Gleichung beschreibt die Gerade durch A und B.")}
+ else if(support)feedback(f,"wrong","Der Stützvektor passt. Überprüfe den Richtungsvektor.");
+ else if(dir)feedback(f,"wrong","Der Richtungsvektor passt. Überprüfe den Stützvektor.");
+ else feedback(f,"wrong","Noch nicht richtig. Prüfe Stütz- und Richtungsvektor.");
+}
+function hintM1(){m1hint++;let f=document.getElementById("fb1"),d=sub(B,A);let s=m1hint===1?"Nutze einen der gegebenen Punkte als Stützpunkt.":m1hint===2?"Berechne den Richtungsvektor mit B − A.":"Ein möglicher Richtungsvektor ist "+fmt(d)+".";feedback(f,"info",s)}
+
+function nonzeroDir(){let v;do{v=[rnd(-4,4),rnd(-4,4),rnd(-4,4)]}while(zero(v));return v}
+function newM2(){
+ m2n++;m2hint=0;m2solved=false;m2choice=null;document.getElementById("m2num").textContent="Aufgabe "+m2n;
+ document.getElementById("yesBtn").classList.remove("selected");document.getElementById("noBtn").classList.remove("selected");
+ document.getElementById("paramInput").value="";
+ noSolutionSelected=false;
+ document.getElementById("noSolutionBtn").classList.remove("selected");
+ document.getElementById("paramInput").disabled=false;
+ hide("fb2");
+ m2type=Math.random()<.5?1:2;
+ if(m2type===1)makeType1(); else makeType2();
+}
+function makeType1(){
+ const S=[rnd(-5,5),rnd(-5,5),rnd(-5,5)],R=nonzeroDir(),t=rnd(-3,3);
+ let P=add(S,mul(t,R)),on=Math.random()<.5;
+ if(!on){let j=rnd(0,2),delta=Math.random()<.5?-1:1;P=[...P];P[j]+=delta}
+ on=zero(sub(P,S))||parallel(sub(P,S),R);
+ m2data={S,R,P,on,t,probeOK:false};
+ document.getElementById("typeLabel").textContent="Punkt auf einer Geraden";
+ document.getElementById("m2task").innerHTML='<div class="task">Gegeben sind die Gerade</div><div class="formula"><strong>g:</strong> <span class="vec">x</span> = '+vectorHTML(S)+' + t · '+vectorHTML(R)+'</div><div class="task">und der Punkt</div><div class="points">P'+fmt(P)+'</div><div class="task">Führe die Punktprobe klassisch durch und prüfe, ob P auf g liegt.</div>';
+ document.getElementById("calcPrompt").innerHTML='1. Stelle zuerst die Punktprobe auf. Trage Stützvektor, Richtungsvektor und den Ortsvektor <span class="overvec">OP</span> selbst ein.';
+ document.getElementById("classicProbe").innerHTML=
+ '<div class="probeeq"><span>'+vinputs("ps")+'</span><span> + t · </span><span>'+vinputs("pr")+'</span><span> = </span><span>'+vinputs("pp")+'</span></div>'+
+ '<div class="buttons"><button class="mini-check" onclick="checkProbeEquation()">Punktprobe prüfen</button></div><div id="probeFeedback" class="feedback"></div>'+
+ '<div class="small" style="margin-top:14px">2. Löse anschließend die Koordinatengleichungen. Gib einen ermittelten Wert für <strong>t</strong> ein und prüfe, ob derselbe Wert alle drei Gleichungen erfüllt. <strong>Brüche sind erlaubt und bei nicht endlichen Dezimalzahlen vorzuziehen</strong>, z. B. −1/3. Existiert kein gemeinsamer Parameterwert, wähle <strong>„Keine Lösung“</strong>.</div>';
+ document.getElementById("paramRow").style.display="flex";
+ document.getElementById("paramLabel").textContent="Dein ermittelter Wert für t:";
+}
+function makeType2(){
+ let A2=[rnd(-5,5),rnd(-5,5),rnd(-5,5)],d=nonzeroDir(),k1=rnd(1,3),k2=rnd(-3,-1),B2=add(A2,mul(k1,d)),C2=add(A2,mul(k2,d)),on=Math.random()<.5;
+ if(!on){let j=rnd(0,2);C2=[...C2];C2[j]+=Math.random()<.5?-1:1}
+ let AB=sub(B2,A2);
+ on=zero(sub(C2,A2))||parallel(sub(C2,A2),AB);
+ m2data={A:A2,B:B2,C:C2,on,d,AB,probeOK:false};
+ document.getElementById("typeLabel").textContent="Drei Punkte auf einer Geraden";
+ document.getElementById("m2task").innerHTML='<div class="task">Gegeben sind die drei Punkte</div><div class="points">A'+fmt(A2)+'<br>B'+fmt(B2)+'<br>C'+fmt(C2)+'</div><div class="task">Prüfe mit einer klassischen Punktprobe, ob A, B und C auf einer gemeinsamen Geraden liegen. Verwende A und B zum Aufstellen der Geraden und prüfe anschließend C.</div>';
+ document.getElementById("calcPrompt").innerHTML='1. Stelle eine beliebige Geradengleichung durch A und B auf und setze ihre rechte Seite gleich dem Ortsvektor <span class="overvec">OC</span>. Als Stützvektor darfst du z. B. <span class="overvec">OA</span> oder <span class="overvec">OB</span> verwenden; als Richtungsvektor sind <span class="overvec">AB</span>, <span class="overvec">BA</span> und alle von null verschiedenen Vielfachen zulässig.';
+ document.getElementById("classicProbe").innerHTML=
+ '<div class="probeeq"><span>'+vinputs("ps")+'</span><span> + t · </span><span>'+vinputs("pr")+'</span><span> = </span><span>'+vinputs("pp")+'</span></div>'+
+ '<div class="buttons"><button class="mini-check" onclick="checkProbeEquation()">Punktprobe prüfen</button></div><div id="probeFeedback" class="feedback"></div>'+
+ '<div class="small" style="margin-top:14px">2. Löse danach die drei Koordinatengleichungen nach <strong>t</strong>. Nur wenn ein gemeinsamer t-Wert existiert, liegt C auf der Geraden durch A und B. <strong>Brüche sind erlaubt und bei nicht endlichen Dezimalzahlen vorzuziehen</strong>, z. B. −1/3. Existiert kein gemeinsamer Parameterwert, wähle <strong>„Keine Lösung“</strong>.</div>';
+ document.getElementById("paramRow").style.display="flex";
+ document.getElementById("paramLabel").textContent="Dein ermittelter Wert für t:";
+}
+function vinputs(prefix){
+ return '<span class="vinput"><input id="'+prefix+'x" type="number"><input id="'+prefix+'y" type="number"><input id="'+prefix+'z" type="number"></span>';
+}
+function read3(prefix){return ["x","y","z"].map(c=>parseMathNumber(document.getElementById(prefix+c).value))}
+function filled3(prefix){return ["x","y","z"].every(c=>document.getElementById(prefix+c).value!=="")}
+function sameVec(a,b){return a.every((x,i)=>Math.abs(x-b[i])<1e-9)}
+function checkProbeEquation(){
+ let f=document.getElementById("probeFeedback");
+ if(!filled3("ps")||!filled3("pr")||!filled3("pp")){
+   m2data.probeOK=false; return feedback(f,"wrong","Die Punktprobe ist noch nicht vollständig eingetragen.");
+ }
+ let S=read3("ps"),R=read3("pr"),P=read3("pp");
+ let expectedP=m2type===1?m2data.P:m2data.C;
+ let sOK,rOK,pOK=sameVec(P,expectedP);
+ if(m2type===1){
+   // Bei vorgegebener Geradengleichung muss deren rechte Seite unverändert
+   // in die Punktprobe übernommen werden.
+   sOK=sameVec(S,m2data.S);
+   rOK=sameVec(R,m2data.R);
+ }else{
+   // Im Drei-Punkte-Fall ist JEDE äquivalente Geradengleichung durch A und B erlaubt:
+   // - jeder Stützpunkt auf der Geraden AB
+   // - jeder von null verschiedene Richtungsvektor parallel zu AB
+   let AB=m2data.AB;
+   let AS=sub(S,m2data.A);
+   sOK=zero(AS) || parallel(AS,AB);
+   rOK=!zero(R) && parallel(R,AB);
+ }
+ if(sOK&&rOK&&pOK){
+   m2data.probeOK=true;m2data.userS=S;m2data.userR=R;
+   let target=m2type===1?"OP":"OC";
+   feedback(f,"correct",'✓ Punktprobe korrekt aufgestellt: Die rechte Seite der Geradengleichung wird mit dem Ortsvektor <span class="overvec">'+target+'</span> gleichgesetzt.');
+ }else{
+   m2data.probeOK=false;
+   let msg="Noch nicht korrekt. ";
+   if(!sOK)msg+=m2type===1?"Überprüfe den Stützvektor. ":"Der Stützvektor muss zu einem Punkt auf der Geraden durch A und B gehören. Du kannst z. B. OA oder OB verwenden. ";
+   if(!rOK)msg+=m2type===1?"Überprüfe den Richtungsvektor. ":"Der Richtungsvektor muss von null verschieden und parallel zu AB sein. Erlaubt sind z. B. AB, BA und jedes von null verschiedene Vielfache davon. ";
+   if(!pOK)msg+=m2type===1?'Rechts vom Gleichheitszeichen muss der Ortsvektor <span class="overvec">OP</span> stehen.':'Rechts vom Gleichheitszeichen muss der Ortsvektor <span class="overvec">OC</span> des dritten Punktes stehen.';
+   feedback(f,"wrong",msg);
+ }
+}
+function vectorHTML(v){return '<span class="display-vector" style="display:inline-block;border-left:2px solid #333;border-right:2px solid #333;border-radius:7px;padding:5px 10px;line-height:1.35">'+v.join("<br>")+"</span>"}
+function selectM2(v){m2choice=v;document.getElementById("yesBtn").classList.toggle("selected",v);document.getElementById("noBtn").classList.toggle("selected",!v)}
+function parseMathNumber(raw){
+ raw=String(raw).trim().replace(/\s+/g,"").replace(/[\u2212\u2013]/g,"-").replace(",",".");
+ if(raw==="") return NaN;
+ if(raw.includes("/")){
+   let parts=raw.split("/");
+   if(parts.length!==2) return NaN;
+   let a=Number(parts[0]), b=Number(parts[1]);
+   if(!Number.isFinite(a)||!Number.isFinite(b)||Math.abs(b)<1e-15) return NaN;
+   return a/b;
+ }
+ let n=Number(raw);
+ return Number.isFinite(n)?n:NaN;
+}
+function nearlyEqual(a,b,tol=1e-6){return Math.abs(a-b)<=tol;}
+function toggleNoSolution(){
+ noSolutionSelected=!noSolutionSelected;
+ const b=document.getElementById("noSolutionBtn"),inp=document.getElementById("paramInput");
+ b.classList.toggle("selected",noSolutionSelected);
+ inp.disabled=noSolutionSelected;
+ if(noSolutionSelected) inp.value="";
+}
+function clearNoSolution(){
+ if(document.getElementById("paramInput").value.trim()!==""){
+   noSolutionSelected=false;
+   document.getElementById("noSolutionBtn").classList.remove("selected");
+ }
+}
+function checkM2(){
+ let f=document.getElementById("fb2");if(m2choice===null)return feedback(f,"wrong","Wähle zuerst „Ja“ oder „Nein“.");
+ let raw=document.getElementById("paramInput").value;
+ if(!noSolutionSelected && raw==="")return feedback(f,"wrong","Gib einen ermittelten Parameterwert t ein oder wähle „Keine Lösung“.");
+ let val=noSolutionSelected?NaN:parseMathNumber(raw),correctChoice=m2choice===m2data.on,calcOK=false,detail="";
+ if(!noSolutionSelected && !Number.isFinite(val))return feedback(f,"wrong","Bitte gib t als Zahl oder Bruch ein, z. B. -1/3, 0,5 oder 0.5.");
+ if(m2type===1){
+   if(!m2data.probeOK)return feedback(f,"wrong","Prüfe zuerst deine aufgestellte Punktprobe mit der Schaltfläche „Punktprobe prüfen“.");
+   let {S,R,P}=m2data;
+   if(noSolutionSelected){
+     calcOK=!m2data.on;
+   }else{
+     // Bei einem vorhandenen gemeinsamen t muss dieser ALLE drei Koordinatengleichungen erfüllen.
+     calcOK=[0,1,2].every(i=>nearlyEqual(S[i]+val*R[i],P[i]));
+   }
+   detail=m2data.on?"Für einen Punkt auf g muss derselbe t-Wert alle drei Koordinatengleichungen erfüllen.":"Bei einem Punkt außerhalb der Geraden kann ein t-Wert zwar zu einer Koordinate passen, aber nicht gleichzeitig zu allen drei.";
+ }else{
+   if(!m2data.probeOK)return feedback(f,"wrong","Prüfe zuerst deine aufgestellte Punktprobe mit der Schaltfläche „Punktprobe prüfen“.");
+   let S=m2data.userS,R=m2data.userR,P=m2data.C;
+   if(noSolutionSelected){
+     calcOK=!m2data.on;
+   }else{
+     calcOK=[0,1,2].every(i=>nearlyEqual(S[i]+val*R[i],P[i]));
+   }
+   detail=m2data.on?"Für C auf der Geraden durch A und B muss derselbe t-Wert alle drei Koordinatengleichungen erfüllen.":"Hier kann ein t-Wert zu einer Koordinate passen, aber nicht gleichzeitig zu allen drei.";
+ }
+ if(correctChoice&&calcOK){
+   if(!m2solved){m2score++;m2solved=true;markMastered(2);document.getElementById("m2score").textContent="Richtig: "+m2score}
+   feedback(f,"correct","✓ Richtig! "+detail);
+ }else if(!correctChoice&&calcOK)feedback(f,"wrong","Dein Rechenansatz enthält einen passenden Parameter/Faktor, aber deine Ja/Nein-Entscheidung stimmt noch nicht. "+detail);
+ else if(correctChoice&&!calcOK)feedback(f,"wrong",m2data.on?"Deine Ja/Nein-Entscheidung ist richtig. Es gibt einen gemeinsamen Parameterwert t; bestimme ihn exakt und prüfe alle drei Koordinatengleichungen.":"Deine Ja/Nein-Entscheidung ist richtig. Da kein gemeinsamer Parameterwert t existiert, wähle bei der Parameterangabe „Keine Lösung“.");
+ else feedback(f,"wrong","Noch nicht richtig. "+detail);
+}
+function hintM2(){
+ m2hint++;let f=document.getElementById("fb2"),s="";
+ if(m2type===1){
+  let {S,R,P}=m2data;
+  if(m2hint===1)s="Setze die Koordinaten von P in die drei Koordinatengleichungen der Geraden ein.";
+  else if(m2hint===2)s="Bestimme t zunächst aus einer Koordinate, deren Richtungsvektor-Komponente nicht 0 ist.";
+  else s="Prüfe anschließend mit demselben t: "+P[0]+" = "+S[0]+" + t·"+R[0]+", "+P[1]+" = "+S[1]+" + t·"+R[1]+", "+P[2]+" = "+S[2]+" + t·"+R[2]+".";
+ }else{
+  let AB=m2data.AB,C=m2data.C,A3=m2data.A;
+  if(m2hint===1)s='Stelle eine Gerade durch A und B auf. Als Stützvektor kannst du z. B. <span class="overvec">OA</span> oder <span class="overvec">OB</span> wählen. Als Richtungsvektor kannst du <span class="overvec">AB</span>, <span class="overvec">BA</span> oder ein von null verschiedenes Vielfaches davon verwenden.';
+  else if(m2hint===2)s='Setze für die Punktprobe die rechte Seite dieser Geradengleichung gleich dem Ortsvektor <span class="overvec">OC</span>.';
+  else s="Es gilt AB = "+fmt(AB)+". Prüfe anschließend komponentenweise: "+C[0]+" = "+A3[0]+" + t·"+AB[0]+", "+C[1]+" = "+A3[1]+" + t·"+AB[1]+", "+C[2]+" = "+A3[2]+" + t·"+AB[2]+".";
+ }
+ feedback(f,"info",s);
+}
+function feedback(el,cls,msg){el.className="feedback "+cls;el.innerHTML=msg}
+function hide(id){let e=document.getElementById(id);e.className="feedback";e.style.display="none";e.innerHTML=""}
+
+let m3n=0,m3score=0,m3hint=0,m3solved=false,m3choice=null,m3data={},m3special=null,m3dimension=2,m3dirRelation=null,m3possible=new Set(),m3precheckOK=false;
+
+function selectM3DirRelation(v){
+ m3dirRelation=v; m3precheckOK=false;
+ document.getElementById("m3dirMultiple").classList.toggle("selected",v==="multiple");
+ document.getElementById("m3dirNotMultiple").classList.toggle("selected",v==="notmultiple");
+ hide("m3prefb");
+}
+function toggleM3Possible(v){
+ m3precheckOK=false;
+ if(m3possible.has(v))m3possible.delete(v);else m3possible.add(v);
+ [["m3preCut","schneidend"],["m3preSkew","windschief"],["m3preParallel","parallel"],["m3preIdentical","identisch"]].forEach(([id,x])=>document.getElementById(id).classList.toggle("selected",m3possible.has(x)));
+ hide("m3prefb");
+}
+function checkM3Precheck(){
+ let f=document.getElementById("m3prefb");
+ if(m3dimension!==3)return;
+ if(m3dirRelation===null)return feedback(f,"wrong","Kreuze zuerst an, ob die Richtungsvektoren Vielfache voneinander sind.");
+ if(m3possible.size===0)return feedback(f,"wrong","Kreuze anschließend die Lagebeziehungen an, die noch in Frage kommen.");
+ let isMultiple=parallel(m3data.R1,m3data.R2),relationOK=m3dirRelation===(isMultiple?"multiple":"notmultiple");
+ let expected=new Set(isMultiple?["parallel","identisch"]:["schneidend","windschief"]);
+ let positionsOK=m3possible.size===expected.size&&[...expected].every(x=>m3possible.has(x));
+ m3precheckOK=relationOK&&positionsOK;
+ if(m3precheckOK){updateM3FinalChoices();return feedback(f,"correct",isMultiple?"✓ Richtig! Bei parallelen Richtungsvektoren kommen parallel oder identisch in Frage.":"✓ Richtig! Bei nicht parallelen Richtungsvektoren kommen schneidend oder windschief in Frage.");}
+ if(!relationOK)return feedback(f,"wrong","Überprüfe zuerst, ob die beiden Richtungsvektoren tatsächlich Vielfache voneinander sind.");
+ feedback(f,"wrong",isMultiple?"Die Richtungsvektoren sind Vielfache. Damit kommen genau parallel oder identisch in Frage.":"Die Richtungsvektoren sind keine Vielfachen. Damit kommen genau schneidend oder windschief in Frage.");
+}
+
+function updateM3FinalChoices(){
+ const map={schneidend:"m3cut",windschief:"m3skew",parallel:"m3parallel",identisch:"m3identical"};
+ if(m3dimension===2){
+   ["m3cut","m3parallel","m3identical"].forEach(id=>document.getElementById(id).style.display="");
+   document.getElementById("m3skew").style.display="none";
+   return;
+ }
+ // Im 3D-Raum wird die endgültige Auswahl erst nach der korrekten Vorprüfung angezeigt.
+ Object.values(map).forEach(id=>document.getElementById(id).style.display="none");
+ if(!m3precheckOK)return;
+ const allowed=m3dirRelation==="multiple"?["parallel","identisch"]:["schneidend","windschief"];
+ allowed.forEach(v=>document.getElementById(map[v]).style.display="");
+}
+
+function setM3Dimension(dim){
+ m3dimension=dim;
+ document.getElementById("m3dim2").classList.toggle("selected",dim===2);
+ document.getElementById("m3dim3").classList.toggle("selected",dim===3);
+ document.querySelectorAll(".m3z").forEach(e=>e.style.display=dim===3?"":"none");
+ document.getElementById("m3dimNotice").innerHTML=dim===2?"Aktuell ist der <strong>zweidimensionale Raum</strong> aktiv.":"Aktuell ist der <strong>dreidimensionale Raum</strong> aktiv. Hier ist zusätzlich die Lage <strong>windschief</strong> möglich.";
+ newM3();
+}
+function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){let t=b;b=a%b;a=t}return a||1}
+function primitiveN(n){let v;do{v=Array.from({length:n},()=>rnd(-4,4))}while(v.every(x=>x===0));let d=v.reduce((g,x)=>gcd(g,x),0)||1;return v.map(x=>x/d)}
+function vnhtml(v){return '<span class="vec2">'+v.join('<br>')+'</span>'}
+function lineNhtml(name,S,R,param){return '<span><strong>'+name+':</strong>&nbsp;<span class="vec">x</span>&nbsp;=</span>'+vnhtml(S)+'<span>+ '+param+' ·</span>'+vnhtml(R)}
+function vecParallelN(a,b){if(a.length===2)return Math.abs(a[0]*b[1]-a[1]*b[0])<1e-9;return parallel(a,b)}
+function newM3(){
+ m3n++;m3hint=0;m3solved=false;m3choice=null;m3dirRelation=null;m3possible=new Set();m3precheckOK=false;m3special=null;
+ document.getElementById("m3num").textContent="Aufgabe "+m3n;
+ ["m3cut","m3parallel","m3identical","m3skew","m3none","m3infinite","m3dirMultiple","m3dirNotMultiple","m3preCut","m3preSkew","m3preParallel","m3preIdentical"].forEach(id=>document.getElementById(id).classList.remove("selected"));
+ ["m3gsx","m3gsy","m3gsz","m3grx","m3gry","m3grz","m3hsx","m3hsy","m3hsz","m3hrx","m3hry","m3hrz","m3t","m3s","m3ix","m3iy","m3iz"].forEach(id=>{let e=document.getElementById(id);if(e)e.value=""});
+ document.getElementById("m3t").disabled=false;document.getElementById("m3s").disabled=false;document.getElementById("m3intersectionBlock").style.display="none";hide("fb3");hide("m3eqfb");hide("m3prefb");
+ let n=m3dimension,types=n===2?["schneidend","parallel","identisch"]:["schneidend","parallel","identisch","windschief"],type=types[rnd(0,types.length-1)];
+ let S1=Array.from({length:n},()=>rnd(-5,5)),R1=primitiveN(n),S2,R2;
+ if(type==="schneidend"){
+   do{R2=primitiveN(n)}while(vecParallelN(R1,R2)); let t0=rnd(-3,3),s0=rnd(-3,3),P=add(S1,mul(t0,R1)); S2=sub(P,mul(s0,R2));
+ }else if(type==="identisch"){
+   let k=[-3,-2,-1,1,2,3][rnd(0,5)];R2=R1.map(x=>k*x);let t0=rnd(-3,3);S2=add(S1,mul(t0,R1));
+ }else if(type==="parallel"){
+   let k=[-3,-2,-1,1,2,3][rnd(0,5)];R2=R1.map(x=>k*x);do{S2=Array.from({length:n},()=>rnd(-5,5))}while(zero(sub(S2,S1))||vecParallelN(sub(S2,S1),R1));
+ }else{
+   do{R2=primitiveN(3)}while(vecParallelN(R1,R2)); let normal=cross(R1,R2),q=[-3,-2,-1,1,2,3][rnd(0,5)]; S2=add(S1,mul(q,normal));
+ }
+ m3data={type,S1,R1,S2,R2,equationOK:false};document.getElementById("m3g").innerHTML=lineNhtml("g",S1,R1,"t");document.getElementById("m3h").innerHTML=lineNhtml("h",S2,R2,"s");
+ document.querySelectorAll(".m3z").forEach(e=>e.style.display=m3dimension===3?"":"none");
+ document.getElementById("m3precheck").style.display=m3dimension===3?"block":"none";
+ updateM3FinalChoices();
+}
+function readM3(prefix){return (m3dimension===3?["x","y","z"]:["x","y"]).map(c=>parseMathNumber(document.getElementById(prefix+c).value))}
+function filledM3(prefix){return (m3dimension===3?["x","y","z"]:["x","y"]).every(c=>document.getElementById(prefix+c).value!=="")}
+function checkM3Equation(){let f=document.getElementById("m3eqfb");if(m3dimension===3&&!m3precheckOK)return feedback(f,"wrong","Prüfe zuerst die Vorprüfung der Richtungsvektoren.");if(!filledM3("m3gs")||!filledM3("m3gr")||!filledM3("m3hs")||!filledM3("m3hr")){m3data.equationOK=false;return feedback(f,"wrong","Die Gleichung ist noch nicht vollständig eingetragen.")}let GS=readM3("m3gs"),GR=readM3("m3gr"),HS=readM3("m3hs"),HR=readM3("m3hr");let ok=sameVec(GS,m3data.S1)&&sameVec(GR,m3data.R1)&&sameVec(HS,m3data.S2)&&sameVec(HR,m3data.R2);m3data.equationOK=ok;feedback(f,ok?"correct":"wrong",ok?"✓ Gleichung korrekt aufgestellt: Die rechten Seiten von g und h wurden gleichgesetzt.":"Noch nicht korrekt. Überprüfe die eingetragenen Stütz- und Richtungsvektoren.")}
+function selectM3Special(v){m3special=m3special===v?null:v;document.getElementById("m3none").classList.toggle("selected",m3special==="none");document.getElementById("m3infinite").classList.toggle("selected",m3special==="infinite");let d=m3special!==null;document.getElementById("m3t").disabled=d;document.getElementById("m3s").disabled=d;if(d){document.getElementById("m3t").value="";document.getElementById("m3s").value=""}}
+function clearM3Special(){if(document.getElementById("m3t").value.trim()!==""||document.getElementById("m3s").value.trim()!==""){m3special=null;document.getElementById("m3none").classList.remove("selected");document.getElementById("m3infinite").classList.remove("selected")}}
+function solveM3Params(){let {S1,R1,S2,R2}=m3data,D=sub(S2,S1),n=m3dimension;for(let i=0;i<n;i++)for(let j=i+1;j<n;j++){let a=R1[i],b=-R2[i],c=R1[j],d=-R2[j],det=a*d-b*c;if(Math.abs(det)>1e-9){let t=(D[i]*d-b*D[j])/det,s=(a*D[j]-D[i]*c)/det;if(Array.from({length:n},(_,k)=>nearlyEqual(S1[k]+t*R1[k],S2[k]+s*R2[k])).every(Boolean))return {t,s};}}return null}
+function selectM3(v){m3choice=v;[["m3cut","schneidend"],["m3parallel","parallel"],["m3identical","identisch"],["m3skew","windschief"]].forEach(([id,x])=>document.getElementById(id).classList.toggle("selected",v===x));document.getElementById("m3intersectionBlock").style.display=v==="schneidend"?"block":"none"}
+function checkM3(){let f=document.getElementById("fb3");if(!m3data.equationOK)return feedback(f,"wrong","Prüfe zuerst die von dir aufgestellte Gleichung mit „Gleichung prüfen“.");if(m3choice===null)return feedback(f,"wrong","Wähle anschließend die Lagebeziehung der beiden Geraden aus.");let algebraOK=false,sol=solveM3Params();if(m3data.type==="schneidend"){if(m3special!==null)return feedback(f,"wrong","Für schneidende Geraden gibt es genau ein Wertepaar (t, s).");let tv=parseMathNumber(document.getElementById("m3t").value),sv=parseMathNumber(document.getElementById("m3s").value);if(!Number.isFinite(tv)||!Number.isFinite(sv))return feedback(f,"wrong","Gib t und s als Zahlen oder Brüche ein.");algebraOK=sol&&nearlyEqual(tv,sol.t)&&nearlyEqual(sv,sol.s);if(algebraOK){let coords=["m3ix","m3iy"].concat(m3dimension===3?["m3iz"]:[]).map(id=>parseMathNumber(document.getElementById(id).value));if(coords.some(x=>!Number.isFinite(x)))return feedback(f,"wrong","Die Parameter stimmen. Gib jetzt noch alle Koordinaten des Schnittpunkts S an.");let P=add(m3data.S1,mul(sol.t,m3data.R1));if(!coords.every((x,i)=>nearlyEqual(x,P[i])))return feedback(f,"wrong","Die Parameter stimmen, aber der Schnittpunkt ist noch nicht richtig.")}}else if(m3data.type==="identisch")algebraOK=m3special==="infinite";else algebraOK=m3special==="none";let positionOK=m3choice===m3data.type;if(algebraOK&&positionOK){if(!m3solved){m3score++;m3solved=true;markMastered(3);document.getElementById("m3score").textContent="Richtig: "+m3score}let msg={schneidend:"✓ Richtig! Die Geraden schneiden sich im angegebenen Punkt.",parallel:"✓ Richtig! Keine Lösung des Gleichungssystems: Die Geraden sind echt parallel.",identisch:"✓ Richtig! Unendlich viele Lösungen: Beide Gleichungen beschreiben dieselbe Gerade.",windschief:"✓ Richtig! Keine Lösung und nicht parallele Richtungsvektoren: Die Geraden sind windschief."}[m3data.type];return feedback(f,"correct",msg)}if(!algebraOK)return feedback(f,"wrong",m3data.type==="identisch"?"Bei identischen Geraden gibt es unendlich viele Lösungen.":m3data.type==="schneidend"?"Überprüfe deine Werte für t und s.":"Das Gleichungssystem besitzt hier keine Lösung.");feedback(f,"wrong","Deine Rechnung passt, aber überprüfe die gewählte Lagebeziehung.")}
+function hintM3(){m3hint++;let f=document.getElementById("fb3"),{S1,R1,S2,R2}=m3data,msg;if(m3hint===1)msg="Vergleiche zuerst die Richtungsvektoren: Sind sie Vielfache voneinander?";else if(m3hint===2)msg=m3dimension===3?"Sind die Richtungsvektoren nicht parallel, setze die Geraden gleich. Gibt es ein gemeinsames Wertepaar (t, s), schneiden sie sich; gibt es keines, sind sie windschief.":"In der Ebene schneiden sich zwei nicht parallele Geraden.";else msg=m3data.type==="identisch"?"Ein Stützpunkt der einen Geraden liegt auf der anderen; beide Richtungsvektoren sind parallel.":m3data.type==="parallel"?"Die Richtungsvektoren sind parallel, aber ein Stützpunkt liegt nicht auf der anderen Geraden.":m3data.type==="windschief"?"Die Richtungsvektoren sind nicht parallel, aber die drei Koordinatengleichungen liefern kein gemeinsames Wertepaar (t, s).":"Löse zwei Koordinatengleichungen nach t und s und prüfe das Ergebnis in der verbleibenden Koordinate.";feedback(f,"info",msg)}
+
+
+// Eine Minustaste je vollständiger Eingabegleichung.
+let lastFocusedMathInput=null;
+document.addEventListener('focusin',e=>{if(e.target.matches('input'))lastFocusedMathInput=e.target;});
+function insertMinusFromButton(btn){
+ const group=btn.closest('.equation, .probeeq, .param-row');
+ if(!group)return;
+ const fields=[...group.querySelectorAll('input:not(:disabled)')];
+ const target=fields.includes(lastFocusedMathInput)?lastFocusedMathInput:fields[0];
+ if(!target)return;
+ target.value=target.value.startsWith('-')?target.value.slice(1):'-'+target.value;
+ target.focus();target.dispatchEvent(new Event('input',{bubbles:true}));
+}
+function insertM4Comma(){
+ const field=document.getElementById('m4angle');
+ if(!field)return;
+ const start=field.selectionStart??field.value.length,end=field.selectionEnd??start;
+ field.value=field.value.slice(0,start)+','+field.value.slice(end);
+ field.focus();field.setSelectionRange(start+1,start+1);
+ field.dispatchEvent(new Event('input',{bubbles:true}));
+}
+function addMinusButtons(){
+ document.querySelectorAll('.equation input, .probeeq input, .param-row input').forEach(inp=>{
+  if(inp.type==='number'){inp.type='text';inp.inputMode='decimal';}
+ });
+ document.querySelectorAll('.minus-group').forEach(w=>{
+  const parent=w.parentNode,vec=w.querySelector('.vector,.vinput');
+  if(vec)parent.insertBefore(vec,w);
+  w.remove();
+ });
+ document.querySelectorAll('.equation, .probeeq, .param-row').forEach(row=>{
+  if(row.closest('#module4'))return;
+  if(!row.querySelector('input'))return;
+  const existing=[...row.children].filter(x=>x.classList&&x.classList.contains('minus-key'));
+  existing.slice(1).forEach(x=>x.remove());
+  if(existing.length)return;
+  const btn=document.createElement('button');btn.type='button';btn.className='minus-key';
+  btn.textContent='−';btn.title='Minus in das ausgewählte Eingabefeld einfügen';
+  btn.onclick=()=>insertMinusFromButton(btn);row.appendChild(btn);
+ });
+}
+const minusObserver=new MutationObserver(addMinusButtons);
+minusObserver.observe(document.body,{childList:true,subtree:true});
+setTimeout(addMinusButtons,0);
+
+
+// Modul 4: Schnittwinkel in 2D und 3D. Gemeinsamer Punkt ist konstruktiv garantiert.
+let m4dimension=2,m4n=0,m4score=0,m4hint=0,m4solved=false,m4data={};
+function setM4Dimension(dim){
+ m4dimension=dim;
+ document.getElementById('m4dim2').classList.toggle('selected',dim===2);
+ document.getElementById('m4dim3').classList.toggle('selected',dim===3);
+ newM4();
+}
+function newM4(){
+ const n=m4dimension;
+ let U,V,dp,nu,nv,cosine;
+ do{
+  U=Array.from({length:n},()=>rnd(-5,5));
+  V=Array.from({length:n},()=>rnd(-5,5));
+  nu=U.reduce((a,x)=>a+x*x,0);nv=V.reduce((a,x)=>a+x*x,0);
+  dp=U.reduce((a,x,i)=>a+x*V[i],0);
+  cosine=nu&&nv?Math.abs(dp)/Math.sqrt(nu*nv):1;
+ }while(nu===0||nv===0||cosine>0.995); // nicht parallel, keine Nullvektoren
+ const P=Array.from({length:n},()=>rnd(-4,4));
+ const t0=rnd(-2,2),s0=rnd(-2,2);
+ const S1=sub(P,mul(t0,U)),S2=sub(P,mul(s0,V));
+ const angle=Math.acos(Math.min(1,Math.max(0,cosine)))*180/Math.PI;
+ m4data={U,V,S1,S2,dp,nu,nv,angle};
+ m4n++;m4hint=0;m4solved=false;
+ document.getElementById('m4num').textContent='Aufgabe '+m4n;
+ document.getElementById('m4g').innerHTML=lineNhtml('g',S1,U,'t');
+ document.getElementById('m4h').innerHTML=lineNhtml('h',S2,V,'s');
+ document.getElementById('m4angle').value='';hide('fb4');
+}
+function checkM4(){
+ const f=document.getElementById('fb4'),raw=document.getElementById('m4angle').value;
+ const val=parseMathNumber(raw);
+ if(!Number.isFinite(val))return feedback(f,'wrong','Gib den Winkel in Grad als Zahl an, z. B. 63,4.');
+ const target=Math.round((m4data.angle+Number.EPSILON)*10)/10;
+ const other=Math.round((180-m4data.angle+Number.EPSILON)*10)/10;
+ if(Math.abs(val-target)<0.000001||Math.abs(val-other)<0.000001){
+  if(!m4solved){m4score++;m4solved=true;markMastered(4);document.getElementById('m4score').textContent='Richtig: '+m4score;}
+  feedback(f,'correct','✓ Richtig! Der Schnittwinkel ist korrekt.');
+ }else feedback(f,'wrong','Noch nicht richtig. Prüfe dein Skalarprodukt und die Vektorlängen. Runde erst am Ende auf eine Nachkommastelle.');
+}
+function hintM4(){
+ m4hint++;const f=document.getElementById('fb4'),d=m4data;
+ if(m4hint===1)return feedback(f,'info','Berechne zuerst das Skalarprodukt der beiden Richtungsvektoren. Berücksichtige, dass zwei ergänzende Winkel möglich sind.');
+ if(m4hint===2)return feedback(f,'info','Skalarprodukt: '+d.dp+'; Betragswert: '+Math.abs(d.dp)+'; Längen: √'+d.nu+' und √'+d.nv+'.');
+ feedback(f,'info','Setze ein: cos(α) = '+d.dp+' / (√'+d.nu+' · √'+d.nv+'). Bestimme den Winkel mit arccos und runde auf eine Nachkommastelle.');
+}
+
+
+
+// Module 5 und 6: Ebenen und Lagebeziehungen
+let m5data={},m5n=0,m5score=0,m5solved=false,m5hint=0;
+let m6data={},m6n=0,m6score=0,m6solved=false,m6hint=0,m6dir=null,m6preOK=false,m6eqOK=false,m6choice=null,m6special=null;
+const dot3=(a,b)=>a.reduce((sum,x,i)=>sum+x*b[i],0);
+const determinant3=(a,b,c)=>dot3(a,cross(b,c));
+const equal3=(a,b)=>a.length===b.length&&a.every((x,i)=>Math.abs(x-b[i])<1e-8);
+function vecFields(prefix){return '<span class="vinput">'+['x','y','z'].map(c=>'<input id="'+prefix+c+'" type="text" inputmode="decimal" autocomplete="off">').join('')+'</span>';}
+function fieldVector(prefix){return ['x','y','z'].map(c=>parseMathNumber(document.getElementById(prefix+c).value));}
+function filledVector(prefix){return ['x','y','z'].every(c=>document.getElementById(prefix+c).value.trim()!=='');}
+function insertMinusFor(module){
+ const root=document.getElementById(module);let inp=document.activeElement;
+ if(!inp||!root.contains(inp)||inp.tagName!=='INPUT'||inp.type==='checkbox')inp=root.querySelector('input[type="text"]');
+ if(!inp)return;
+ const a=inp.selectionStart??inp.value.length,b=inp.selectionEnd??a;
+ if(inp.value.startsWith('-')){inp.value=inp.value.slice(1);inp.focus();}
+ else {inp.value='-'+inp.value;inp.focus();inp.setSelectionRange(Math.max(1,a+1),Math.max(1,b+1));}
+ inp.dispatchEvent(new Event('input',{bubbles:true}));
+}
+function newM5(){
+ m5n++;m5solved=false;m5hint=0;
+ let A,B,C,U,V;
+ do{A=Array.from({length:3},()=>rnd(-4,4));U=primitiveN(3);V=primitiveN(3);}while(zero(cross(U,V)));
+ B=add(A,mul(rnd(1,2),U));C=add(A,mul(rnd(1,2),V));m5data={A,B,C};
+ document.getElementById('m5num').textContent='Aufgabe '+m5n;
+ document.getElementById('m5points').innerHTML='A'+fmt(A)+' &nbsp; B'+fmt(B)+' &nbsp; C'+fmt(C);
+ document.getElementById('m5inputs').innerHTML=vecFields('m5p')+' <span>+ r ·</span> '+vecFields('m5u')+' <span>+ s ·</span> '+vecFields('m5v');
+ hide('fb5');
+}
+function checkM5(){
+ const f=document.getElementById('fb5');if(!['m5p','m5u','m5v'].every(filledVector))return feedback(f,'wrong','Bitte alle neun Koordinaten eingeben.');
+ const P=fieldVector('m5p'),U=fieldVector('m5u'),V=fieldVector('m5v'),{A,B,C}=m5data;
+ if([...P,...U,...V].some(x=>!Number.isFinite(x)))return feedback(f,'wrong','Bitte gültige Zahlen eingeben.');
+ const N=cross(sub(B,A),sub(C,A));
+ const ok=!zero(cross(U,V))&&Math.abs(dot3(N,sub(P,A)))<1e-8&&Math.abs(dot3(N,U))<1e-8&&Math.abs(dot3(N,V))<1e-8;
+ if(ok){if(!m5solved){m5solved=true;m5score++;markMastered(5);document.getElementById('m5score').textContent='Richtig: '+m5score;}feedback(f,'correct','✓ Richtig! Deine beiden unabhängigen Richtungsvektoren spannen die Ebene durch A, B und C auf.');}
+ else feedback(f,'wrong','Prüfe, ob dein Stützpunkt in der Ebene liegt und beide Richtungsvektoren in der Ebene liegen und keine Vielfachen sind.');
+}
+function hintM5(){m5hint++;const {A,B,C}=m5data;feedback(document.getElementById('fb5'),'info',m5hint===1?'Verwende einen der drei Punkte als Stützpunkt.':m5hint===2?'Bilde zwei Verbindungsvektoren mit gemeinsamem Anfangspunkt.':'Ein möglicher Ansatz ist A + r · AB + s · AC mit AB = '+fmt(sub(B,A))+' und AC = '+fmt(sub(C,A))+'.');}
+function makeM6(type){
+ let P,U,V,D,G,normal;
+ do{P=Array.from({length:3},()=>rnd(-3,3));U=primitiveN(3);V=primitiveN(3);normal=cross(U,V);}while(zero(normal));
+ if(type==='schneidend'){
+  do{D=primitiveN(3);}while(dot3(normal,D)===0);
+  const X=add(P,add(mul(rnd(-2,2),U),mul(rnd(-2,2),V)));
+  G=sub(X,mul(rnd(-2,2),D));
+ }else{
+  do{D=add(mul(rnd(-2,2),U),mul(rnd(-2,2),V));}while(zero(D));
+  G=add(P,add(mul(rnd(-2,2),U),mul(rnd(-2,2),V)));
+  if(type==='parallel'){let shift;do{shift=rnd(-3,3);}while(shift===0);G=add(G,mul(shift,normal.map(x=>x/gcd3(normal))));}
+ }
+ return {type,P,U,V,G,D,normal};
+}
+function gcd3(v){return v.reduce((a,b)=>gcd(a,b),0)||1;}
+function newM6(){
+ m6n++;m6solved=false;m6hint=0;m6dir=null;m6preOK=false;m6eqOK=false;m6choice=null;m6special=null;
+ m6data=makeM6(['schneidend','parallel','enthalten'][rnd(0,2)]);
+ document.getElementById('m6num').textContent='Aufgabe '+m6n;
+ const {G,D,P,U,V}=m6data;
+ document.getElementById('m6g').innerHTML=lineNhtml('g',G,D,'t');
+ document.getElementById('m6e').innerHTML='<span><strong>E:</strong> <span class="vec">x</span> =</span>'+vnhtml(P)+'<span>+ r ·</span>'+vnhtml(U)+'<span>+ s ·</span>'+vnhtml(V);
+ document.getElementById('m6eqinputs').innerHTML=vecFields('m6gs')+' <span>+ t ·</span> '+vecFields('m6gd')+' <span>=</span> '+vecFields('m6ep')+' <span>+ r ·</span> '+vecFields('m6eu')+' <span>+ s ·</span> '+vecFields('m6ev')+' <button type="button" class="minus-key" onclick="insertMinusFor(\'module6\')">−</button>';
+ document.querySelectorAll('#module6 .m3-choice').forEach(b=>b.classList.remove('selected'));
+
+ ['m6t','m6r','m6s','m6ix','m6iy','m6iz'].forEach(id=>{document.getElementById(id).value='';document.getElementById(id).disabled=false;});
+ document.getElementById('m6intersection').style.display='none';
+ ['m6eqfb','fb6'].forEach(hide);
+}
+function checkM6Equation(){const f=document.getElementById('m6eqfb');const prefixes=['m6gs','m6gd','m6ep','m6eu','m6ev'];if(!prefixes.every(filledVector))return feedback(f,'wrong','Trage alle Vektoren vollständig ein.');const {G,D,P,U,V}=m6data;const ok=prefixes.every((prefix,i)=>equal3(fieldVector(prefix),[G,D,P,U,V][i]));m6eqOK=ok;feedback(f,ok?'correct':'wrong',ok?'✓ Gleichung korrekt aufgestellt.':'Überprüfe die übernommenen Stütz- und Richtungsvektoren.');}
+function selectM6Special(v){m6special=m6special===v?null:v;document.getElementById('m6none').classList.toggle('selected',m6special==='none');document.getElementById('m6inf').classList.toggle('selected',m6special==='infinite');document.getElementById('m6one').classList.toggle('selected',m6special==='one');['m6t','m6r','m6s'].forEach(id=>{document.getElementById(id).disabled=!!m6special&&m6special!=='one';if(m6special&&m6special!=='one')document.getElementById(id).value='';});}
+function selectM6(v){m6choice=v;[['m6cut','schneidend'],['m6parallel','parallel'],['m6contained','enthalten']].forEach(([id,key])=>document.getElementById(id).classList.toggle('selected',v===key));document.getElementById('m6intersection').style.display=v==='schneidend'?'block':'none';}
+function checkM6(){
+ const f=document.getElementById('fb6');if(!m6eqOK)return feedback(f,'wrong','Prüfe zuerst die Gleichung.');if(!m6choice)return feedback(f,'wrong','Wähle eine Lagebeziehung.');
+ const {type,G,D,P,U,V}=m6data;
+ if(type!==m6choice)return feedback(f,'wrong','Die gewählte Lagebeziehung stimmt noch nicht.');
+ if(type!=='schneidend'){
+  if(m6special!==(type==='parallel'?'none':'infinite'))return feedback(f,'wrong',type==='parallel'?'Das Gleichungssystem hat keine Lösung.':'Das Gleichungssystem hat unendlich viele Lösungen.');
+ }else{
+  if(m6special!=='one')return feedback(f,'wrong','Wähle „Genau eine Lösung“ und gib die drei Parameter an.');
+  const vals=['m6t','m6r','m6s'].map(id=>parseMathNumber(document.getElementById(id).value));
+  if(vals.some(x=>!Number.isFinite(x)))return feedback(f,'wrong','Gib t, r und s als Zahlen oder Brüche ein.');
+  const [t,r,s]=vals,X=add(G,mul(t,D)),Y=add(P,add(mul(r,U),mul(s,V)));
+  if(!equal3(X,Y))return feedback(f,'wrong','Die drei Parameter erfüllen die Gleichung noch nicht gleichzeitig.');
+  const coords=['m6ix','m6iy','m6iz'].map(id=>parseMathNumber(document.getElementById(id).value));
+  if(coords.some(x=>!Number.isFinite(x))||!equal3(coords,X))return feedback(f,'wrong','Prüfe die Koordinaten des Schnittpunkts.');
+ }
+ if(!m6solved){m6solved=true;m6score++;markMastered(6);document.getElementById('m6score').textContent='Richtig: '+m6score;}
+ feedback(f,'correct','✓ Richtig! Lagebeziehung und Rechnung stimmen.');
+}
+function hintM6(){m6hint++;feedback(document.getElementById('fb6'),'info',m6hint===1?'Setze die rechte Seite der Geradengleichung mit der rechten Seite der Ebenengleichung gleich.':m6hint===2?'Vergleiche die drei Koordinaten und löse das Gleichungssystem nach t, r und s.':'Keine Lösung bedeutet echt parallel; unendlich viele Lösungen bedeuten, dass die Gerade in der Ebene liegt. Bei genau einer Lösung gibt es einen Schnittpunkt.');}
+
+// Adaptiver Lernstand: Eine korrekt gelöste konkrete Zahlenaufgabe wird nicht erneut gestellt.
+const masteredTasks={1:new Set(),2:new Set(),3:new Set(),4:new Set(),5:new Set(),6:new Set()};
+const taskKeys={};
+function taskKey(module){
+ if(module===1)return JSON.stringify([A,B]);
+ if(module===2)return JSON.stringify([m2type,m2data.S,m2data.R,m2data.P,m2data.A,m2data.B,m2data.C]);
+ if(module===3)return JSON.stringify([m3dimension,m3data.S1,m3data.R1,m3data.S2,m3data.R2]);
+ if(module===5)return JSON.stringify([m5data.A,m5data.B,m5data.C]);
+ if(module===6)return JSON.stringify([m6data.G,m6data.D,m6data.P,m6data.U,m6data.V]);
+ return JSON.stringify([m4dimension,m4data.S1,m4data.U,m4data.S2,m4data.V]);
+}
+function markMastered(module){masteredTasks[module].add(taskKeys[module]);updateLearningStatus();}
+function updateLearningStatus(){
+ document.getElementById('learningStatus').textContent='In dieser Sitzung richtig gelöst (wird nicht erneut gestellt): '+[1,2,3,4,5,6].map(n=>'Modul '+n+': '+masteredTasks[n].size).join(' · ');
+}
+function resetLearning(){
+ if(!confirm('Den gesamten Lernstand zurücksetzen und alle Aufgaben wieder freigeben?'))return;
+ for(let n=1;n<=6;n++)masteredTasks[n].clear();
+ updateLearningStatus();finalIndex=0;finalCorrect=0;finalData=null;newM1();newM2();newM3();newM4();newM5();newM6();
+}
+function adaptiveNext(module,generate){
+ let attempts=0,key;
+ do{generate();key=taskKey(module);attempts++;}while(masteredTasks[module].has(key)&&attempts<300);
+ taskKeys[module]=key;
+}
+const originalNewM1=newM1,originalNewM2=newM2,originalNewM3=newM3,originalNewM4=newM4,originalNewM5=newM5,originalNewM6=newM6;
+newM1=()=>adaptiveNext(1,originalNewM1);
+newM2=()=>adaptiveNext(2,originalNewM2);
+newM3=()=>adaptiveNext(3,originalNewM3);
+newM4=()=>adaptiveNext(4,originalNewM4);
+newM5=()=>adaptiveNext(5,originalNewM5);
+newM6=()=>adaptiveNext(6,originalNewM6);
+
+// Abschlussübungen: sechs Themen aus den sechs Modulen, ausschließlich Endergebnisse.
+let finalIndex=0,finalCorrect=0,finalSolved=false,finalChoice=null,finalData=null;
+const finalOrder=[1,2,3,4,5,6];
+function showFinal(){
+ document.querySelectorAll('.module,.tab').forEach(x=>x.classList.remove('active'));
+ document.getElementById('moduleFinal').classList.add('active');
+ document.getElementById('tabFinal').classList.add('active');
+ if(!finalData)nextFinal();
+}
+function finalV(v){return '<span class="final-vector">'+v.map((_,i)=>'<input class="final-input" inputmode="decimal" aria-label="Koordinate '+(i+1)+'">').join('')+'</span>';}
+function finalRead(){return [...document.querySelectorAll('#finalAnswer input')].map(x=>parseMathNumber(x.value));}
+function finalPick(v){finalChoice=v;document.querySelectorAll('#finalChoices button').forEach(b=>b.classList.toggle('selected',b.dataset.value===v));}
+function finalOptions(values){return '<div id="finalChoices" class="m3-choice-grid">'+values.map(([value,label])=>'<button type="button" class="m3-choice" data-value="'+value+'" onclick="finalPick(this.dataset.value)">'+label+'</button>').join('')+'</div>';}
+function finalLines(a,b){return '<div class="two-lines"><div class="line-display">'+a+'</div><div class="line-display">'+b+'</div></div>';}
+function nextFinal(){
+ finalSolved=false;finalChoice=null;hide('finalFeedback');
+ let mod=finalOrder[finalIndex%finalOrder.length];finalIndex++;
+ let task='',answer='',data={mod};
+ if(mod===1){newM1();data.A=[...A];data.B=[...B];task='<p>Stelle die Geradengleichung durch A'+fmt(A)+' und B'+fmt(B)+' auf.</p>';answer='<div class="param-row">g: <span class="vec">x</span> = '+finalV(A)+' + t · '+finalV(A)+'</div>';}
+ if(mod===2){newM2();data.on=m2data.on;task=document.getElementById('m2task').innerHTML;answer=finalOptions([['ja','Ja'],['nein','Nein']]);}
+ if(mod===3){newM3();data.type=m3data.type;data.S1=m3data.S1;data.R1=m3data.R1;data.S2=m3data.S2;data.R2=m3data.R2;task='<p>Bestimme die Lagebeziehung der Geraden.</p>'+finalLines(lineNhtml('g',data.S1,data.R1,'t'),lineNhtml('h',data.S2,data.R2,'s'));answer=finalOptions([['schneidend','schneidend'],['parallel','parallel'],['identisch','identisch'],...(m3dimension===3?[['windschief','windschief']]:[])]);}
+ if(mod===4){newM4();data.angle=m4data.angle;task='<p>Bestimme einen Schnittwinkel auf eine Stelle nach dem Komma.</p>'+finalLines(document.getElementById('m4g').innerHTML,document.getElementById('m4h').innerHTML);answer='α = <input class="final-input" inputmode="decimal" aria-label="Winkel"> ° <button type="button" class="minus-key" onclick="finalComma()">,</button>';}
+ if(mod===5){newM5();data.A=[...m5data.A];data.B=[...m5data.B];data.C=[...m5data.C];task='<p>Stelle die Ebenengleichung in Parameterform durch A'+fmt(data.A)+', B'+fmt(data.B)+' und C'+fmt(data.C)+' auf.</p>';answer='<div class="param-row">E: <span class="vec">x</span> = '+finalV(data.A)+' + r · '+finalV(data.A)+' + s · '+finalV(data.A)+'</div>';}
+ if(mod===6){newM6();data.type=m6data.type;task='<p>Bestimme die Lage der Geraden zur Ebene.</p>'+finalLines(document.getElementById('m6g').innerHTML,document.getElementById('m6e').innerHTML);answer=finalOptions([['schneidend','schneidend'],['parallel','echt parallel'],['enthalten','Gerade liegt in der Ebene']]);}
+ finalData=data;document.getElementById('finalTask').innerHTML=task;document.getElementById('finalAnswer').innerHTML=answer;
+ document.getElementById('finalProgress').textContent='Aufgabe '+finalIndex+' · Thema aus Modul '+mod;
+ document.getElementById('finalScore').textContent='Richtig: '+finalCorrect;
+}
+function finalComma(){let e=document.querySelector('#finalAnswer input');if(!e)return;let p=e.selectionStart??e.value.length;e.value=e.value.slice(0,p)+','+e.value.slice(p);e.focus();e.setSelectionRange(p+1,p+1);}
+function finalSame(a,b){return a.length===b.length&&a.every((x,i)=>Number.isFinite(x)&&nearlyEqual(x,b[i]));}
+function checkFinal(){
+ const f=document.getElementById('finalFeedback');if(finalSolved)return feedback(f,'correct','✓ Bereits richtig gelöst. Mit „Nächste Aufgabe“ geht es weiter.');
+ const d=finalData;if(!d)return;let ok=false;
+ if([2,3,6].includes(d.mod)){if(finalChoice===null)return feedback(f,'wrong','Bitte wähle ein Ergebnis aus.');ok=finalChoice===(d.mod===2?(d.on?'ja':'nein'):d.type);}
+ if(d.mod===4){const v=finalRead()[0],a=Math.round(d.angle*10)/10,b=Math.round((180-d.angle)*10)/10;ok=Number.isFinite(v)&&(nearlyEqual(v,a)||nearlyEqual(v,b));}
+ if(d.mod===1){const v=finalRead(),P=v.slice(0,3),R=v.slice(3),AB=sub(d.B,d.A);ok=v.length===6&&!zero(R)&&parallel(R,AB)&&(zero(sub(P,d.A))||parallel(sub(P,d.A),AB));}
+ if(d.mod===5){const v=finalRead(),P=v.slice(0,3),U=v.slice(3,6),V=v.slice(6,9),N=cross(sub(d.B,d.A),sub(d.C,d.A));ok=v.length===9&&v.every(Number.isFinite)&&!zero(cross(U,V))&&nearlyEqual(dot3(N,sub(P,d.A)),0)&&nearlyEqual(dot3(N,U),0)&&nearlyEqual(dot3(N,V),0);}
+ if(ok){finalSolved=true;finalCorrect++;document.getElementById('finalScore').textContent='Richtig: '+finalCorrect;feedback(f,'correct','✓ Richtig!');}else feedback(f,'wrong','Noch nicht richtig. Überprüfe deine Rechnung auf Papier und korrigiere dein Endergebnis.');
+}
+
+newM1();newM2();newM3();addMinusButtons();newM4();newM5();newM6();updateLearningStatus();
+</script>
+</body>
+</html>
