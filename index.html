@@ -600,11 +600,13 @@ function hintM3(){m3hint++;let f=document.getElementById("fb3"),{S1,R1,S2,R2}=m3
 // Eine Minustaste je vollständiger Eingabegleichung.
 let lastFocusedMathInput=null;
 document.addEventListener('focusin',e=>{if(e.target.matches('input'))lastFocusedMathInput=e.target;});
+document.addEventListener('pointerdown',e=>{if(e.target.closest('.minus-key'))e.preventDefault();});
+document.addEventListener('mousedown',e=>{if(e.target.closest('.minus-key'))e.preventDefault();});
 function insertMinusFromButton(btn){
  const group=btn.closest('.equation, .probeeq, .param-row');
  if(!group)return;
  const fields=[...group.querySelectorAll('input:not(:disabled)')];
- const target=fields.includes(lastFocusedMathInput)?lastFocusedMathInput:fields[0];
+ const target=fields.includes(lastFocusedMathInput)?lastFocusedMathInput:null;
  if(!target)return;
  target.value=target.value.startsWith('-')?target.value.slice(1):'-'+target.value;
  target.focus();target.dispatchEvent(new Event('input',{bubbles:true}));
@@ -702,8 +704,8 @@ function fieldVector(prefix){return ['x','y','z'].map(c=>parseMathNumber(documen
 function filledVector(prefix){return ['x','y','z'].every(c=>document.getElementById(prefix+c).value.trim()!=='');}
 function insertMinusFor(module){
  const root=document.getElementById(module);let inp=document.activeElement;
- if(!inp||!root.contains(inp)||inp.tagName!=='INPUT'||inp.type==='checkbox')inp=root.querySelector('input[type="text"]');
- if(!inp)return;
+ if(!inp||!root.contains(inp)||inp.tagName!=='INPUT'||inp.type==='checkbox')inp=lastFocusedMathInput;
+ if(!inp||!root.contains(inp)||inp.disabled||!document.body.contains(inp))return;
  const a=inp.selectionStart??inp.value.length,b=inp.selectionEnd??a;
  if(inp.value.startsWith('-')){inp.value=inp.value.slice(1);inp.focus();}
  else {inp.value='-'+inp.value;inp.focus();inp.setSelectionRange(Math.max(1,a+1),Math.max(1,b+1));}
